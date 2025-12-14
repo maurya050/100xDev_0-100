@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const jwtPassword = "secret";
+require('dotenv').config();
+const jwtPassword = process.env.JWT_PASSWORD || "secret";
 const zod = require("zod");
 
 const emailSchema = zod.string().email();

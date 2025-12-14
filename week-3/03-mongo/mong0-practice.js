@@ -1,10 +1,12 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
-const jwtPassword = "123456";
+require('dotenv').config();
+
+const jwtPassword = process.env.JWT_PASSWORD;
 
 mongoose.connect(
-  "mongodb+srv://mauryashivam050_db_user:rySIIvAKs2dK03ht@cluster0.glnnio2.mongodb.net/user_app"
+  process.env.MONGODB_URI
 );
 
 const User = mongoose.model("User", {

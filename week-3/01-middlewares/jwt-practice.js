@@ -1,6 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const jwtPassword = "123456";
+require('dotenv').config();
+const jwtPassword = process.env.JWT_PASSWORD || "123456";
 
 const app = express();
 
