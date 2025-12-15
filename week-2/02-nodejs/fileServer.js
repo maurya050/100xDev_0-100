@@ -17,5 +17,34 @@ const fs = require('fs');
 const path = require('path');
 const app = express();
 
+app.get('/files', (req, res) => {
+  const directoryPath = path.join(__dirname, 'files');
+  fs.readdir(directoryPath, (err, files) => {
+    if (err) {
+      return res.status(500).send('Unable to scan files');
+    }
+    res.status(200).json(files);
+  });
+});
+
+app.get('/file/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const filePath = path.join(__dirname, 'files', filename);
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+      return res.status(404).send('File not found');
+    }
+    res.status(200).send(data);
+  });
+});
+
+app.all('*', (req, res) => {
+  req.status(404).send('Route not found');
+}); 
+
+
+app.listen(3000);
+
+
 
 module.exports = app;
