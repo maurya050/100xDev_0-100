@@ -40,10 +40,87 @@
   Testing the server - run `npm run test-todoServer` command in terminal
  */
   const express = require('express');
-  const bodyParser = require('body-parser');
-  
+  // const bodyParser = require('body-parser');
+  const fs = require('fs');
+  const path = require('path');
   const app = express();
   
-  app.use(bodyParser.json());
+  app.use(express.json());
+
+  const DATA_FILE = path.join(__dirname, 'todos.json');
+  
+  function readTodosFromFile() {
+    try {
+      const data = fs.readFileSync(DATA_FILE, 'utf8');
+      return JSON.parse(data);
+    } catch (err) {
+      return [];
+    }
+  }
+  
+  function writeTodosToFile(todos) {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(todos, null, 2), 'utf8');
+  }
+
+  let todos = readTodosFromFile();
+  let nextId = todos.length > 0 ? Math.max(...todos.map(todo => todo.id)) + 1 : 1;
+  
+  app.get('/todos', (req, res) => {
+    todos = readTodosFromFile();
+    res.status(200).json(todos);
+  });
+
+  app.get('/todos/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    todos = readTodosFromFile();
+    const todo = todos.find(t => t.id === id);
+    if (todo) {
+      res.status(200).json(todo);
+    } else {
+      res.status(404).send('Not Found');
+    }
+  });
+
+  app.post('/todos', (req, res) => {
+    const { title, description } = req.body;
+    const newTodo = { id: nextId++, title, description };
+    todos = readTodosFromFile();
+    todos.push(newTodo);
+    writeTodosToFile(todos);
+    res.status(201).json({ id: newTodo.id });
+  });
+
+  app.put('/todos/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const { title, description } = req.body;
+    todos = readTodosFromFile();
+    const todoIndex = todos.findIndex(t => t.id === id);
+    if (todoIndex !== -1) {
+      todos[todoIndex] = { id, title, description };
+      writeTodosToFile(todos);
+      res.status(200).send('OK');
+    } else {
+      res.status(404).send('Not Found');
+    }
+  });
+
+  app.delete('/todos/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    todos = readTodosFromFile();
+    const todoIndex = todos.findIndex(t => t.id === id);
+    if (todoIndex !== -1) {
+      todos.splice(todoIndex, 1);
+      writeTodosToFile(todos);
+      res.status(200).send('OK');
+    } else {
+      res.status(404).send('Not Found');
+    }
+  });
+  
+  app.all('*', (req, res) => {
+    res.status(404).send('Not Found');
+  });
+  
+  app.listen(3000);
   
   module.exports = app;
