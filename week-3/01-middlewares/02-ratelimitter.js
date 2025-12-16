@@ -12,6 +12,7 @@ const app = express();
 // clears every one second
 
 let numberOfRequestsForUser = {};
+
 setInterval(() => {
     numberOfRequestsForUser = {};
 }, 1000)
