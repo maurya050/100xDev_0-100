@@ -13,8 +13,24 @@ const app = express();
 
 let numberOfRequestsForUser = {};
 
+app.use((req, res, next) => {
+  const userId = req.header['user-id'];
+  if (!userId) {
+    return res.status(404).send('User ID is required');
+  }
+
+  numberOfRequestsForUser[userId] = (numberOfRequestsForUser[userId] || 0) + 1;
+
+  if (numberOfRequestsForUser[userId] > 5) {
+    return res.status(404).send('Rate limit exceeded');
+  }
+
+  next();
+});
+
 setInterval(() => {
     numberOfRequestsForUser = {};
+
 }, 1000)
 
 app.get('/user', function(req, res) {
