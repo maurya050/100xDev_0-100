@@ -4,20 +4,16 @@ const express = require("express");
 const app = express();
 
 
-const validateInput = (obj) => {
-    const schema = zod.object({
-        name: zod.string().min(3),
-        age: zod.number().min(0).max(120),
-        email: zod.string().email(),
-    });
-
-    return schema.safeParse(obj);
-}
+const validateInput = zod.object({
+    name : zod.string().min(3).max(50),
+    age: zod.number().min(10).max(100),
+    email: zod.string().regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email format"),
+})
 
 app.use(express.json());
 
 app.post("/validate", (req, res) => {
-    const parsed = validateInput(req.body);
+    const parsed = validateInput.safeParse(req.body);
 
     if (!parsed.success) {
         return res.status(400).json({ error: "Invalid input", details: parsed.error.errors });
