@@ -21,7 +21,14 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 app.get("/check", (req, res) => {
+    const {email, password} = req.body;
+    const parsed = loginSchema.safeParse({ email, password });
+
+    if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid input. Please provide a valid email and password (8-32 characters)." });
+    }
     res.send("Hello, World!");
+    
 });
 
 app.post("/health-check", (req, res) => {
