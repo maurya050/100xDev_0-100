@@ -1,7 +1,10 @@
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
 const jwtPassword = process.env.JWT_PASSWORD || 'secret';
 
+const zod = require("zod");
+
+const emailSchema = zod.string().email();
+const passwordSchema = zod.string().min(6);
 
 /**
  * Generates a JWT for a given username and password.
@@ -16,6 +19,11 @@ const jwtPassword = process.env.JWT_PASSWORD || 'secret';
  */
 function signJwt(username, password) {
     // Your code here
+    if (!emailSchema.safeParse(username).success || !passwordSchema.safeParse(password).success) {
+        return null;
+    }
+    const token = jwt.sign({ username: username }, jwtPassword);
+    return token;
 }
 
 /**
@@ -28,6 +36,12 @@ function signJwt(username, password) {
  */
 function verifyJwt(token) {
     // Your code here
+    try {
+        jwt.verify(token, jwtPassword);
+        return true;
+    } catch (error) {
+        return false;
+    }
 }
 
 /**
@@ -38,7 +52,13 @@ function verifyJwt(token) {
  *                         Returns false if the token is not a valid JWT format.
  */
 function decodeJwt(token) {
-    // Your code here
+    const decoded = jwt.decode(token);
+    console.log(decoded);
+    if (decoded) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 
