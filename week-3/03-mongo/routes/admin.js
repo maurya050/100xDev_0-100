@@ -31,6 +31,8 @@ router.post('/signup', async (req, res) => {
 
 router.post('/courses', adminMiddleware, (req, res) => {
     // Implement course creation logic
+    const { title, description, price } = req.body;
+    const token = req.headers.authorization;
     
 
 });

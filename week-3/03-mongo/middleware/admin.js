@@ -7,6 +7,17 @@ function adminMiddleware(req, res, next) {
     // Implement admin auth logic
     // You need to check the headers and validate the admin from the admin DB. Check readme for the exact headers to be expected
     const token = req.headers.authorization;
+    const decoded = jwt.verify(token, jwtPassword);
+    const email = decoded.email;
+    Admin.findOne({email: email}, (err, admin) => {
+        if (err || !admin) {
+            return res.status(403).json({
+                msg: "Admin authentication failed",
+            });
+        }
+        req.admin = admin;
+        next();
+    });
 
 }
 
