@@ -1,12 +1,11 @@
 const { Router } = require("express");
 const adminMiddleware = require("../middleware/admin");
-const router = Router();
-const Admin = require('../db').Admin;
-const Course = require('../db').Course;
+const {Admin, Course} = require('../db');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const jwtPassword = process.env.JWT_PASSWORD;
 
+const router = Router();
 
 
 // Admin Routes
@@ -30,34 +29,49 @@ router.post('/signup',  async (req, res) => {
     });
 });
 
-router.post('/courses', adminMiddleware, (req, res) => {
+// Admin Signin Route
+route.post('/signin', async (req, res) => {
+    // Implement admin signin logic
+    const { email, password } = req.body;
+    const admin = await Admin.findOne({ email: email, password: password });
+    if (!admin) {
+        return res.status(403).json({
+            msg: "Admin authentication failed",
+        });
+    }
+    var token = jwt.sign({email : email}, jwtPassword);
+    return res.json({
+        token,
+    });
+})
+
+router.post('/courses', adminMiddleware, async (req, res) => {
     // Implement course creation logic
-    const { id, title, description, price } = req.body;
+    const { title, description, price } = req.body;
     const newCourse = new Course({
-        id: id,
         title: title,
         description: description,
         price: price,
     });
-    newCourse.save();
+    await newCourse.save();
     return res.json({
         msg: "Course created successfully",
         courseId: newCourse._id,
     });
 });
 
-router.get('/courses', adminMiddleware, (req, res) => {
+router.get('/courses', adminMiddleware, async (req, res) => {
     // Implement fetching all courses logic
-    Course.find({}, (err, courses) => {
-        if (err) {
-            return res.status(500).json({
-                msg: "Error fetching courses",
-            });
-        }
+    try{
+        const courses = await Course.find({});
         return res.json({
-            courses: courses,
+            courses: courses
         });
-    });
+    } catch(err) {
+        return res.status(500).json({
+            msg: "Error fetching courses"   
+        }); 
+    }
 });
 
 module.exports = router;
