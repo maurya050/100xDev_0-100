@@ -1,24 +1,35 @@
-const Admin = require('../db').Admin;
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
+const { Admin } = require("../db");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+
 const jwtPassword = process.env.JWT_PASSWORD;
 // Middleware for handling auth
-function adminMiddleware(req, res, next) {
-    // Implement admin auth logic
-    // You need to check the headers and validate the admin from the admin DB. Check readme for the exact headers to be expected
+async function adminMiddleware(req, res, next) {
+  try {
     const token = req.headers.authorization;
+
+    if (!token) {
+      return res.status(403).json({
+        msg: "Admin authentication failed",
+      });
+    }
+
     const decoded = jwt.verify(token, jwtPassword);
     const email = decoded.email;
-    Admin.findOne({email: email}, (err, admin) => {
-        if (err || !admin) {
-            return res.status(403).json({
-                msg: "Admin authentication failed",
-            });
-        }
-        req.admin = admin;
-        next();
-    });
 
+    const admin = await Admin.findOne({ email: email });
+    if (!admin) {
+      return res.status(403).json({
+        msg: "Admin authentication failed",
+      });
+    }
+    req.admin = admin;
+    next();
+  } catch (err) {
+    return res.status(403).json({
+      msg: "Admin authentication failed",
+    });
+  }
 }
 
 module.exports = adminMiddleware;
