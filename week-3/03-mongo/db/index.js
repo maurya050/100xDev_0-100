@@ -12,15 +12,23 @@ const AdminSchema = new mongoose.Schema({
     password: String
 });
 
+const PurchasedCourses = new mongoose.Schema({
+    // Schema definition here
+    courseId: String,
+    purchaseDate: Date
+});
+
 const UserSchema = new mongoose.Schema({
     // Schema definition here
     name: String,
     email: String,
-    password: String
+    password: String,
+    purchasedCourses: [PurchasedCourses]
 });
 
 const CourseSchema = new mongoose.Schema({
     // Schema definition here
+    id: String,
     title: String,
     description: String,
     price: Number
