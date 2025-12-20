@@ -30,7 +30,7 @@ router.post('/signup',  async (req, res) => {
 });
 
 // Admin Signin Route
-route.post('/signin', async (req, res) => {
+router.post('/signin', async (req, res) => {
     // Implement admin signin logic
     const { email, password } = req.body;
     const admin = await Admin.findOne({ email: email, password: password });

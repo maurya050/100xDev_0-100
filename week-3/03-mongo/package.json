@@ -16,6 +16,7 @@
     "jest": "^29.7.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.20.2",
+    "route": "^0.2.5",
     "supertest": "^6.3.3",
     "ts-node": "^10.9.2"
   }

@@ -48,7 +48,7 @@ router.post("/signin", async (req, res) => {
   });
 });
 
-router.get("/courses", async (req, res) => {
+router.get("/courses", userMiddleware, async (req, res) => {
   // Implement listing all courses logic
   try {
     const courses = await Course.find({});
