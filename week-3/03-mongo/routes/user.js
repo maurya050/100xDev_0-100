@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const router = Router();
 const userMiddleware = require("../middleware/user");
-const User = require('../db').User;
+const {User, Course} = require('../db');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const jwtPassword = process.env.JWT_PASSWORD;
