@@ -3,12 +3,21 @@ const adminMiddleware = require("../middleware/admin");
 const {Admin, Course} = require('../db');
 const router = Router();
 const { Admin } = require("../db");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+const jwtPassword = process.env.JWT_PASSWORD;
 
 // Admin Routes
 router.post('/signup', async (req, res) => {
     // Implement admin signup logic
     const { name, email, password } = req.body;
     const admin = new Admin({ name, email, password });
+    const adminExists = await Admin.exists({ email: email });
+    if (adminExists) {
+        return res.status(403).json({
+            msg: "Admin already exists",
+        });
+    }
     await admin.save();
     return res.json({
         msg: "Admin created successfully",
@@ -24,8 +33,9 @@ router.post('/signin', adminMiddleware, async (req, res) => {
             msg: "Admin authentication failed",
         });
     }
+    const token = jwt.sign({ email: email }, jwtPassword);
     return res.json({
-        msg: "Admin signed in successfully",
+        token,
     });
 
 });
